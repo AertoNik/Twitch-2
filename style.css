@@ -221,3 +221,40 @@ body { margin: 0; background-color: var(--bg); font-family: 'Inter', sans-serif;
    .nav-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
    .nav-btn.active { color: var(--accent); }
 }
+
+/* --- ЭМОДЗИ И ПОДПИСКИ (САБЫ) --- */
+.chat-emote { 
+    height: 24px; 
+    vertical-align: middle; 
+    margin: 0 2px; 
+    display: inline-block;
+}
+
+.chat-sub-msg {
+    background: linear-gradient(90deg, rgba(145, 70, 255, 0.15), transparent);
+    border-left: 3px solid var(--accent);
+    padding: 8px 10px;
+    margin: 6px 0;
+    border-radius: 4px;
+    animation: fadeIn 0.3s ease;
+}
+
+.chat-sub-header { 
+    font-weight: 700; 
+    color: var(--text); 
+    font-size: 13px; 
+    margin-bottom: 4px;
+}
+
+.chat-sub-header span { 
+    color: var(--accent); 
+    text-shadow: 0 0 8px rgba(145, 70, 255, 0.4);
+}
+
+.chat-sub-months {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
