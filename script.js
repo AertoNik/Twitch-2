@@ -27,6 +27,7 @@ function saveStateLocally() { localStorage.setItem('stream_sim_state', JSON.stri
 
 let isLive = false;
 let currentViewers = 0;
+let raidBoostTimer = 0; // Таймер ускорения после рейда
 let targetViewers = 0;
 let streamStartTime = 0;
 let liveInterval = null;
@@ -488,6 +489,9 @@ function streamTick() {
    const uptimeStr = h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`;
    document.getElementById('live-uptime').innerText = uptimeStr;
 
+   if (raidBoostTimer > 0) raidBoostTimer--; // Таймер рейда тикает вниз
+
+   // Имитация плавания онлайна
    if (Math.random() > 0.2) {
        if (Math.random() < 0.05) {
            let baseMultiplier = 0.01 + (Math.random() * 0.02);
@@ -504,14 +508,21 @@ function streamTick() {
        document.getElementById('live-viewers').innerText = formatNum(currentViewers);
    }
 
-   const chatChance = Math.min(0.1 + (currentViewers / 5000), 1.0);
+   // Модификаторы шансов (если идет рейд, всё ускоряется)
+   let chatMult = raidBoostTimer > 0 ? 3 : 1; // Чат в 3 раза быстрее
+   let donateMult = raidBoostTimer > 0 ? 5 : 1; // Шанс доната в 5 раз выше
+
+   const chatChance = Math.min(0.1 + (currentViewers / 5000), 1.0) * chatMult;
    if (Math.random() < chatChance) {
        const msgs = currentViewers > 1000 ? Math.floor(Math.random() * 4) + 1 : 1;
        for(let i=0; i<msgs; i++) generateChatMessage();
    }
 
-   const donateChance = Math.min(0.002 + (currentViewers / 50000), 0.05);
+   const donateChance = Math.min(0.002 + (currentViewers / 50000), 0.05) * donateMult;
    if (Math.random() < donateChance) triggerDonation();
+
+   // ОЧЕНЬ РЕДКИЙ шанс рейда (0.05% каждую секунду)
+   if (Math.random() < 0.0005) triggerRaid();
 
    if (Math.random() < 0.05) {
        state.followers += Math.floor(Math.random() * 3) + 1;
@@ -711,6 +722,68 @@ function triggerDonation() {
        alertBox.classList.remove('alert-epic', 'show-da'); 
        alertGif.src = ""; 
    }, 10000);
+}
+
+// Функция запуска Редкого Рейда (Атмосферного)
+function triggerRaid() {
+    if (raidBoostTimer > 0) return; // Если эффект рейда еще идет, ждем
+
+    // Выбираем стримера
+    const raider = FAKE_CHANNELS_POOL[Math.floor(Math.random() * FAKE_CHANNELS_POOL.length)].n;
+    
+    // Элегантный размер рейда (от 1000 до 4000 человек)
+    const raidSize = Math.floor(Math.random() * 3000) + 1000; 
+
+    // Накручиваем онлайн
+    currentViewers += raidSize;
+    targetViewers += raidSize;
+    document.getElementById('live-viewers').innerText = formatNum(currentViewers);
+
+    // 1. Мягкий, кинематографичный звук уведомления (играет 3 секунды)
+    const audio = document.getElementById('donate-sound');
+    if(audio) {
+        if (window.audioStopTimer) clearTimeout(window.audioStopTimer);
+        // Звук глубокого мистического появления
+        audio.src = "https://actions.google.com/sounds/v1/science_fiction/magic_sweep.ogg"; 
+        audio.currentTime = 0;
+        audio.play().catch(e => {});
+        window.audioStopTimer = setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 3000);
+    }
+
+    // 2. Системное уведомление прямо в чат (без огромных плашек)
+    const chatBox = document.getElementById('chat-messages');
+    const sysMsg = document.createElement('div');
+    sysMsg.className = 'chat-msg';
+    sysMsg.style.background = 'rgba(145, 70, 255, 0.1)';
+    sysMsg.style.borderLeft = '3px solid var(--accent)';
+    sysMsg.style.padding = '10px';
+    sysMsg.style.borderRadius = '4px';
+    sysMsg.style.margin = '10px 0';
+    sysMsg.style.textAlign = 'center';
+    sysMsg.innerHTML = `<span style="color: var(--accent); font-weight: 700; letter-spacing: 1px;">[ARCHETYPE SYSTEM]</span><br><span style="color: var(--text); font-size: 13px;">Входящее подключение. <b>${raider}</b> перенаправляет ${raidSize} зрителей.</span>`;
+    chatBox.appendChild(sysMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // 3. Активируем буст чата и донатов на 60 секунд!
+    raidBoostTimer = 60;
+
+    // 4. Элегантные сообщения от новоприбывших зрителей
+    const RAID_MSGS = [
+        `мы от ${raider}`, "какой приятный визуал", "очень атмосферно тут", 
+        "привет!", "уютный стрим", "остаюсь тут", "шикарная картинка", 
+        "зашли на огонек", "добрый вечер", "ARCHETYPE? звучит круто",
+        "вау, какой свет", "тут спокойнее"
+    ];
+
+    let spamCount = 0;
+    const spamInterval = setInterval(() => {
+        const msg = RAID_MSGS[Math.floor(Math.random() * RAID_MSGS.length)];
+        // Новые зрители пишут приглушенным, серым цветом (стильно и не бьет по глазам)
+        generateChatMessage(null, msg, "var(--text-muted)"); 
+        spamCount++;
+        
+        if (spamCount > 15) clearInterval(spamInterval); 
+    }, 400); // Сообщения появляются плавно
 }
 
 // СТАРТ
