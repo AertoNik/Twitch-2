@@ -710,7 +710,7 @@ function triggerDonation() {
        alertBox.classList.add('hidden'); 
        alertBox.classList.remove('alert-epic', 'show-da'); 
        alertGif.src = ""; 
-   }, 6000);
+   }, 10000);
 }
 
 // СТАРТ
