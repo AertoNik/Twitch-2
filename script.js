@@ -656,7 +656,7 @@ function triggerDonation() {
        } else {
            // ТИР 3: Мощный кинематографичный бас
            audio.src = "https://www.myinstants.com/media/sounds/king-nassir.mp3"; 
-           playDurationMs = 4500; 
+           playDurationMs = 8500; 
            selectedGif = gifsEpic[Math.floor(Math.random() * gifsEpic.length)];
        }
        
