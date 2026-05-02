@@ -805,9 +805,17 @@ function triggerRaid() {
 function triggerSubscription() {
     const user = CHAT_USERS[Math.floor(Math.random() * CHAT_USERS.length)];
     const isPrime = Math.random() > 0.7; // 30% шанс на Twitch Prime
-    const months = Math.random() > 0.5 ? Math.floor(Math.random() * 24) + 2 : 1; // Либо первый месяц, либо от 2 до 25
+    const months = Math.random() > 0.5 ? Math.floor(Math.random() * 24) + 2 : 1; 
 
-    // 1. Приятный звук уведомления о сабе (колокольчик)
+    // --- НОВОЕ: НАЧИСЛЯЕМ ДЕНЬГИ ЗА САБКУ ---
+    // Допустим, с одной рублевой подписки стример получает чистыми около 130-150 рублей
+    const subIncome = isPrime ? 130 : 150; 
+    state.balance += subIncome;
+    saveStateLocally();
+    updateWalletUI();
+    // ----------------------------------------
+
+    // 1. Приятный звук уведомления
     const audio = document.getElementById('donate-sound');
     if(audio) {
         if (window.audioStopTimer) clearTimeout(window.audioStopTimer);
@@ -833,7 +841,7 @@ function triggerSubscription() {
     if (isScrolledToBottom) chatBox.scrollTop = chatBox.scrollHeight;
     if (chatBox.children.length > 150) chatBox.removeChild(chatBox.firstChild);
 
-    // 3. Зрители реагируют смайликами на нового саба
+    // 3. Зрители реагируют смайликами
     setTimeout(() => generateChatMessage(null, "Pog", null), 600);
     setTimeout(() => generateChatMessage(null, "PogU", null), 1200);
     setTimeout(() => generateChatMessage(null, "W", null), 1800);
