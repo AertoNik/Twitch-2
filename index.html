@@ -53,7 +53,14 @@
                         
                         <div id="stream-player" class="stream-player hidden">
                             <div id="media-wrapper" class="media-wrapper"></div>
-                            
+                            <!-- AFK СЦЕНА -->
+<div id="afk-overlay" class="afk-overlay hidden">
+    <div class="afk-content">
+        <h2 style="letter-spacing: 4px; color: var(--accent); margin-bottom: 5px;">SYSTEM STANDBY</h2>
+        <p style="color: var(--text-muted); margin: 0;">STREAMER IS AWAY</p>
+        <div class="afk-pulse"></div>
+    </div>
+</div>
                             <!-- Оверлей для сцены "Ожидание" -->
                             <div id="wait-overlay" class="wait-overlay hidden">
                                 <div style="font-size: 14px; letter-spacing: 4px; color: var(--accent); margin-bottom: 10px; font-weight: bold;">ТРАНСЛЯЦИЯ СКОРО НАЧНЕТСЯ</div>
@@ -73,6 +80,7 @@
                         <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-right: 10px; display: flex; align-items: center; gap: 5px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg> Сцены:</span>
                         <button class="obs-btn active" id="btn-scene-chat" onclick="setScene('chat')">🎥 Just Chatting</button>
                         <button class="obs-btn" id="btn-scene-cinema" onclick="setScene('cinema')">🎬 Кино (ARCHETYPE)</button>
+                        <button onclick="toggleAFK()" id="btn-afk" class="control-btn">☕ AFK</button>
                         <button class="obs-btn" id="btn-scene-wait" onclick="setScene('wait')">⏳ Ожидание</button>
                     </div>
 

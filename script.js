@@ -26,6 +26,7 @@ if (!state.bioText) state.bioText = defaultState.bioText;
 function saveStateLocally() { localStorage.setItem('stream_sim_state', JSON.stringify(state)); }
 
 let isLive = false;
+let isAFK = false;
 let currentViewers = 0;
 let raidBoostTimer = 0; // Таймер ускорения после рейда
 let targetViewers = 0;
@@ -33,7 +34,28 @@ let streamStartTime = 0;
 let liveInterval = null;
 let currentTitle = "Трансляция";
 let currentCategory = "Общение";
-
+// Функция Включения/Отключения AFK
+function toggleAFK() {
+    if (!isLive) return; // AFK работает только на запущенном стриме
+    isAFK = !isAFK;
+    
+    const overlay = document.getElementById('afk-overlay');
+    const btn = document.getElementById('btn-afk');
+    const chatBox = document.getElementById('chat-messages');
+    
+    if (isAFK) {
+        overlay.classList.remove('hidden');
+        btn.style.background = "var(--accent)";
+        btn.style.color = "#fff";
+        chatBox.innerHTML += `<div class="chat-msg" style="color: var(--accent); font-weight: bold; border-left: 2px solid var(--accent); padding-left: 8px; margin-top: 10px;">[SYSTEM]: Переход в режим ожидания.</div>`;
+    } else {
+        overlay.classList.add('hidden');
+        btn.style.background = "";
+        btn.style.color = "";
+        chatBox.innerHTML += `<div class="chat-msg" style="color: #22c55e; font-weight: bold; border-left: 2px solid #22c55e; padding-left: 8px; margin-top: 10px;">[SYSTEM]: Подключение восстановлено.</div>`;
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 // OBS Таймер
 let waitTimerInterval = null;
 let waitSeconds = 300;
@@ -679,7 +701,16 @@ function generateChatMessage(userOverride, textOverride, colorOverride) {
            isVip = true;
        } else {
            user = CHAT_USERS[Math.floor(Math.random() * CHAT_USERS.length)];
-           const msgPool = Math.random() > 0.5 ? GENERAL_MSGS : (CATEGORY_MSGS[currentCategory] || GENERAL_MSGS);
+           
+           // === НОВАЯ ЛОГИКА ДЛЯ AFK ===
+           let msgPool;
+           if (isAFK) {
+               msgPool = ["Zzzzz", "ждем", "AFK", "пошел за кофе?", "ResidentSleeper", "когда вернется? Sadge", "VIBE", "музыка каеф catJAM", "заваривает чай", "тишина monkaS", "ждем шедевр"];
+           } else {
+               msgPool = Math.random() > 0.5 ? GENERAL_MSGS : (CATEGORY_MSGS[currentCategory] || GENERAL_MSGS);
+           }
+           // ==============================
+
            text = msgPool[Math.floor(Math.random() * msgPool.length)];
            color = CHAT_COLORS[Math.floor(Math.random() * CHAT_COLORS.length)];
        }
